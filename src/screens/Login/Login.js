@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import {
   Text,
   View,
@@ -46,7 +46,6 @@ const LoginScreen = ({navigation}) => {
         text: 'Cancel'
       }
     ]);
-    
   }
 
   const login = async () => {
@@ -176,7 +175,7 @@ const LoginScreen = ({navigation}) => {
       </View>
     );
   } else {
-    navigation.navigate('Dashboard');
+    navigation.navigate('Dashboard', { biometricType });
   }
 };
 
