@@ -5,20 +5,7 @@ export const checkBiometrics = async () => {
   try {
     const {available, biometryType} = await Biometrics.isSensorAvailable();
     if (available) {
-      const result = await Biometrics.simplePrompt({
-        promptMessage: 'Authenticate to log in.',
-      });
-
-      if (result.success) {
-        // Biometric authentication successful
-        return biometryType;
-      } else {
-        // Biometric authentication failed
-        Alert.alert('Biometrics authentication failed', 'Please try again or use username and password to login.', [
-          {text: 'OK'},
-        ]);
-        return false;
-      }
+      loginBiometrics(biometryType);
     } else {
       // Biometric authentication not available
       // fallback to username/password login 
@@ -33,3 +20,20 @@ export const checkBiometrics = async () => {
     return error;
   }
 };
+
+export const loginBiometrics = async (biometryType) => {
+  const result = await Biometrics.simplePrompt({
+    promptMessage: 'Authenticate to log in.',
+  });
+
+  if (result.success) {
+    // Biometric authentication successful
+    return biometryType;
+  } else {
+    // Biometric authentication failed
+    Alert.alert('Biometrics authentication failed', 'Please try again or use username and password to login.', [
+      {text: 'OK'},
+    ]);
+    return false;
+  }
+}
