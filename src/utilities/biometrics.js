@@ -1,32 +1,35 @@
-const checkBiometrics = async () => {
+import { Alert } from 'react-native';
+import Biometrics from 'react-native-biometrics';
+
+export const checkBiometrics = async () => {
   try {
     const {available, biometryType} = await Biometrics.isSensorAvailable();
+    if (available) {
+      const result = await Biometrics.simplePrompt({
+        promptMessage: 'Authenticate to log in.',
+      });
 
-    if (available && biometryType) {
-      // setBiometricType(biometryType);
-      return biometryType;
+      if (result.success) {
+        // Biometric authentication successful
+        return biometryType;
+      } else {
+        // Biometric authentication failed
+        Alert.alert('Biometrics authentication failed', 'Please try again or use username and password to login.', [
+          {text: 'OK'},
+        ]);
+        return false;
+      }
     } else {
-      console.log('Biometrics not available on this device.');
+      // Biometric authentication not available
+      // fallback to username/password login 
+      Alert.alert('Biometrics authentication not available', 'Please login using username and password.', [
+        {text: 'OK'},
+      ]);
     }
   } catch (error) {
-    console.error('Biometrics check error:', error);
+    Alert.alert('Biometrics check error.', [
+      {text: 'OK'},
+    ]);
     return error;
-  }
-};
-
-const authenticateWithBiometrics = async () => {
-  try {
-    const {success} = await Biometrics.simplePrompt({
-      promptMessage: 'Authenticate to log in.',
-    });
-
-    if (success) {
-      // Authentication successful, proceed with login logic
-      console.log('Biometric authentication successful');
-    } else {
-      console.log('Biometric authentication failed or cancelled.');
-    }
-  } catch (error) {
-    console.error('Biometric authentication error:', error);
   }
 };

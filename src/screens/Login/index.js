@@ -9,8 +9,8 @@ import {
   Alert,
 } from 'react-native';
 
-import signInWithEmailAndPassword from '../../services/apiServiceDefinition';
-import checkBiometrics from '../../utilities/biometrics';
+import { signInWithEmailAndPassword } from '../../services/apiServiceDefinition';
+import { checkBiometrics } from '../../utilities/biometrics';
 
 const LoginScreen = ({navigation}) => {
   const [user, setUser] = useState();
@@ -19,6 +19,35 @@ const LoginScreen = ({navigation}) => {
   const [password, setPassword] = useState();
 
   const [biometricType, setBiometricType] = useState(null);
+
+  const loginBiometrics = async () => {
+    Alert.alert('Biometrics Authentication', 'Do you want to login using Face/Touch ID?', [
+      {
+        text: 'OK',
+        onPress: async () => {
+          try {
+            const biometricType = await checkBiometrics();
+            if (biometricType) {
+              setBiometricType(biometricType);
+              setUser(biometricType);
+            } else {
+              Alert.alert('Biometrics Auth Error', 'Please try again!', [
+                {text: 'OK'},
+              ]);
+            }
+          } catch {
+            Alert.alert('Biometrics Auth not available', 'Please try again!', [
+              {text: 'OK'},
+            ]);
+          }
+        },
+      },
+      {
+        text: 'Cancel'
+      }
+    ]);
+    
+  }
 
   const login = async () => {
     if (emailAdd !== null && emailAdd?.trim().length > 3) {
@@ -31,10 +60,6 @@ const LoginScreen = ({navigation}) => {
           Alert.alert('Login Successful', 'Welcome!', [
             {
               text: 'OK',
-              onPress: () => {
-                const biometricType = checkBiometrics();
-                setBiometricType(biometricType);
-              },
             },
           ]);
         } else {
@@ -74,6 +99,14 @@ const LoginScreen = ({navigation}) => {
         }
         if (error.code === 'auth/user-not-found') {
           Alert.alert('Login Error', 'User not found!', [
+            {
+              text: 'Cancel',
+              style: 'cancel',
+            },
+            {text: 'OK'},
+          ]);
+        } else {
+          Alert.alert('Login Error', 'Service not available at the moment.', [
             {
               text: 'Cancel',
               style: 'cancel',
@@ -124,8 +157,8 @@ const LoginScreen = ({navigation}) => {
                 justifyContent: 'center',
                 margin: 25,
               }}>
-              <TouchableOpacity style={styles.button} onPress={login}>
-                <Text style={{color: 'white', fontSize: 20}}>SIGNUP</Text>
+              <TouchableOpacity style={styles.button} onPress={loginBiometrics}>
+                <Text style={{color: 'white', fontSize: 20}}>TOUCH/FACE ID</Text>
               </TouchableOpacity>
             </View>
           </View>
